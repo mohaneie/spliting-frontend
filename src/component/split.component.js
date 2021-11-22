@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { CREATE_SPLITING } from '../../src/core/actions/actions-type'
+import { CREATE_SPLITING } from '../../src/core/actions/actions-type';
+import swal from 'sweetalert';
+
 
 
 
 const SplitComponent = (props) => {
-    
+
     const [splitData, setSpliData] = useState(null);
+    const [showPayment, setShowPayment] = useState(false);
+    const [index, setIndex] = useState([]);
+    const [selectIndex, setSelectIndex] = useState(null);
 
     const handleChange = ({ target }) => {
         const { name, value } = target;
@@ -34,19 +39,44 @@ const SplitComponent = (props) => {
         }
     }
 
+    const handleClickToPay = (e) => {
+        setSelectIndex(+e.target.value)
+        setShowPayment(!showPayment)
+    }
+
+    const handlePayment = () => {
+        swal({
+            title: "Payment is done!",
+            icon: "success",
+        });
+        setIndex([...index, selectIndex])
+        setShowPayment(false)
+    }
+
     useEffect(() => {
     }, [props?.splits?.split])
 
     var elements = [];
-    if(props?.splits?.split) {
+    if (props?.splits?.split) {
         for (var i = 1; i <= props?.splits?.split?.totalPerson; i++) {
-            elements.push(<div class="alert alert-primary" role="alert">
-            {`Person ${i} Split Amount: ${props?.splits?.split?.splittedAmount || 'N/A'}`}
-          </div>);
+            elements.push(<div className="alert alert-primary" role="alert">
+                <div key={i} className="d-flex justify-content-between">
+                    <div>
+                        {`Person ${i}`}
+                    </div>
+                    <div>
+                        {`Split Amount: ${props?.splits?.split?.splittedAmount || 'N/A'}`}
+                    </div>
+                    <div>
+                        <div className="form-check">
+                            <input type="checkbox" disabled={index.includes(i)} value={i} onClick={handleClickToPay} className="form-check-input" id="exampleCheck1" />
+                            <label className="form-check-label">{index.includes(i) ? 'Paid' : 'Click To Pay'}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>);
         }
     }
-   
-
 
     return (
         <>
@@ -70,45 +100,14 @@ const SplitComponent = (props) => {
                                 </div>
                             </div>
 
-                            <div className="row">
+                            <div className="row mt-5">
                                 <div className="col">
                                     <div className="jumbotron">
                                         {
-                                           elements
+                                            elements
 
                                         }
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col">
-                                    <h6>select the payment options</h6>
-                                    <div className="card">
-                                        <div className="card-body">
-                                            <div>
-                                                <div className="form-check">
-                                                    <input className="form-check-input" type="radio" name="debit" value="" />
-                                                    <label className="form-check-label">
-                                                        Debit Card
-                                                    </label>
-                                                </div>
-                                                <div className="form-check">
-                                                    <input className="form-check-input" type="radio" name="debit" value="" />
-                                                    <label className="form-check-label">
-                                                        Credit card
-                                                    </label>
-                                                </div>
-                                                <div className="form-check">
-                                                    <input className="form-check-input" type="radio" name="debit" value="" />
-                                                    <label className="form-check-label">
-                                                        Phone pay
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                         </>
@@ -127,6 +126,47 @@ const SplitComponent = (props) => {
                                 </form>
                             </div>
                         </div>
+                }
+                {
+                    showPayment ? <div className="row">
+                        <div className="col">
+                            <h6>Select the payment options</h6>
+                            <div className="card">
+                                <div className="card-body">
+                                    <div>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="radio" name="debit" value="" />
+                                            <label className="form-check-label">
+                                                Debit Card
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="radio" name="debit" value="" />
+                                            <label className="form-check-label">
+                                                Credit card
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="radio" name="debit" value="" />
+                                            <label className="form-check-label">
+                                                Phone pay
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input className="form-check-input" type="radio" name="debit" value="" />
+                                            <label className="form-check-label">
+                                                Money Pay
+                                            </label>
+                                        </div>
+                                        <div className="mt-5">
+                                            <button type="submit" onClick={handlePayment} className="btn btn-secondary">Pay Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div> : null
                 }
             </div>
         </>
